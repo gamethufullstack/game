@@ -297,7 +297,7 @@ public class ComputerPlayer : IPlayer
     private static readonly Random _random = new Random();
     public IAction ChooseAction(Battle battle, Character character)
     {
-        //Thread.Sleep(500);
+        Thread.Sleep(500);
 
         List<Character> potentialTargets = battle.GetEnemyPartyFor(character).Characters;
         if (potentialTargets.Count > 0) return new AttackAction(character.StandardAttack, battle.GetEnemyPartyFor(character).Characters[0]);
