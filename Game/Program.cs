@@ -1,4 +1,4 @@
-﻿while (true)
+while (true)
 {
     string name = ColoredConsole.Prompt("What is your name?").ToUpper();
 
@@ -17,14 +17,14 @@
     int round = 0;
 
     Party heroes = new Party(player1);
-    heroes.Characters.Add(new VinFletcher());
+    heroes.Characters.Add(new Fletcher());
     heroes.Characters.Add(new TheTrueProgrammer(name));
 
     heroes.Items.Add(new HealItem());
     heroes.Items.Add(new HealItem());
     heroes.Items.Add(new HealItem());
 
-    heroes.Items.Add(new SimulaSoup());
+    heroes.Items.Add(new Soup());
 
     List<Party> battleRound = new List<Party>() { CreateMonsterParty1(player2), CreateMonsterParty2(player2), CreateMonsterParty3(player2) };
 
@@ -66,7 +66,7 @@ Party CreateMonsterParty3(IPlayer playerControl)
 {
     Party monsters = new Party(playerControl);
     monsters.Characters.Add(new FlameWraith());
-    monsters.Characters.Add(new TheUncodedOne());
+    monsters.Characters.Add(new Boss());
     return monsters;
 }
 
@@ -131,7 +131,7 @@ public class GameRendering
             ConsoleColor color = character == activeCharacter ? ConsoleColor.Yellow : ConsoleColor.Gray;
             if (character.HP / (float)character.MaxHp < 0.10)
                 ColoredConsole.WriteLine($"                                                          {character.Name,45} ({character.HP}/{character.MaxHp}) !", ConsoleColor.Red);
-            else ColoredConsole.WriteLine($"                                                          {character.Name,45} ({character.HP}/{character.MaxHp})", color);
+            else ColoredConsole.WriteLine($"                                                         {character.Name,45} ({character.HP}/{character.MaxHp})", color);
         }
         Console.WriteLine("=================================================================================================");
     }
@@ -294,10 +294,10 @@ public record MenuChoice(string Decriptions, IAction? Action)
 
 public class ComputerPlayer : IPlayer
 {
-    static private readonly Random _random = new Random();
+    private static readonly Random _random = new Random();
     public IAction ChooseAction(Battle battle, Character character)
     {
-        Thread.Sleep(500);
+        //Thread.Sleep(500);
 
         List<Character> potentialTargets = battle.GetEnemyPartyFor(character).Characters;
         if (potentialTargets.Count > 0) return new AttackAction(character.StandardAttack, battle.GetEnemyPartyFor(character).Characters[0]);
@@ -331,9 +331,9 @@ public class HealItem : IItem
     }
 }
 
-public class SimulaSoup : IItem
+public class Soup : IItem
 {
-    public string Name => "SIMULA SOUP";
+    public string Name => "SOUP";
     public void Use(Battle battle, Character user)
     {
         user.HP = user.MaxHp;
@@ -369,18 +369,18 @@ public class TheTrueProgrammer : Character
     public TheTrueProgrammer(string name) : base(25) => Name = name;
 }
 
-public class VinFletcher : Character
+public class Fletcher : Character
 {
-    public override string Name => "VIN FLETCHER";
+    public override string Name => "FLETCHER";
     public override Attack StandardAttack { get; } = new QuickShot();
-    public VinFletcher() : base(5) { }
+    public Fletcher() : base(5) { }
 }
 
-public class TheUncodedOne : Character
+public class Boss : Character
 {
     public override Attack StandardAttack { get; } = new Unraveling();
-    public override string Name => "THE UNCODED ONE";
-    public TheUncodedOne() : base(25) { }
+    public override string Name => "BOSS";
+    public Boss() : base(25) { }
 }
 
 public class FlameWraith : Character
@@ -396,6 +396,18 @@ public class Skeleton : Character
 
     public override string Name => "SKELETON";
     public Skeleton() : base(5) { }
+}
+
+public class Party
+{
+    public List<Character> Characters { get; } = new List<Character>();
+    public List<IItem> Items { get; } = new List<IItem>();
+    public IPlayer Player { get; }
+
+    public Party(IPlayer player)
+    {
+        Player = player;
+    }
 }
 
 public static class ColoredConsole
@@ -421,20 +433,8 @@ public static class ColoredConsole
         ConsoleColor previousColor = Console.ForegroundColor;
         Console.Write(questiontoAsk + " ");
         Console.ForegroundColor = ConsoleColor.Cyan;
-        string input = Console.ReadLine() ?? "";
+        string input = Console.ReadLine() ?? "...";
         Console.ForegroundColor = previousColor;
         return input;
-    }
-}
-
-public class Party
-{
-    public List<Character> Characters { get; } = new List<Character>();
-    public List<IItem> Items { get; } = new List<IItem>();
-    public IPlayer Player { get; }
-
-    public Party(IPlayer player)
-    {
-        Player = player;
     }
 }
